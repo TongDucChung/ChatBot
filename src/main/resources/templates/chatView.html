@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Chat Box</title>
+</head>
+<body class="bg-gray-200 flex justify-center items-center h-screen">
+<div class="w-full max-w-2xl h-[90vh] flex flex-col bg-white shadow-lg rounded-lg overflow-hidden">
+
+  <!-- Header -->
+  <div class="bg-gray-100 px-4 py-3 flex justify-between items-center border-b-2 border-gray">
+    <div class="flex items-center">
+<!--      <img src="/image/chatbot.png" alt="Avatar" class="w-10 h-10 rounded-full">-->
+      <div class="ml-3">
+        <p class="font-bold text-lg">Chung</p>
+        <p class="text-sm text-gray-500">Vừa truy cập</p>
+      </div>
+    </div>
+    <div>
+      <p class="text-sm text-gray-700">User: <span id="loggedInUser">Nguyen Van A</span></p>
+    </div>
+  </div>
+
+  <div id="autoScroll" class="flex-1 p-4 overflow-y-auto bg-gray-100 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300">
+    <!-- Đoạn chào mừng -->
+    <div id="typingWelcome" class="flex items-center mb-2">
+<!--      <img src="/image/chatbot.png" alt="Avatar" class="w-8 h-8 rounded-full mr-2">-->
+      <div class="bg-white border px-4 py-2 rounded-lg max-w-xs text-sm shadow break-words" style="word-wrap: break-word;"></div>
+    </div>
+  </div>
+
+  <!-- Chat Messages -->
+  <div id="autoScroll" class="flex-1 p-4 overflow-y-auto bg-gray-100 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300">
+    <!-- Các câu hỏi và câu trả lời trước đó sẽ được thêm vào ở đây -->
+  </div>
+
+  <!-- Input Box -->
+  <div class="bg-gray-100 p-3 border-t flex items-center">
+    <textarea id="messageInput" placeholder="Nhập tin nhắn..."
+              class="flex-1 p-2 border rounded-lg resize-none overflow-y-auto w-full h-[65%] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300"
+              oninput="autoExpand(this)"></textarea>
+    <button id="sendButton" class="ml-3 px-4 py-2 bg-blue-500 text-white rounded-lg">Gửi</button>
+  </div>
+</div>
+
+<script>
+  function autoExpand(textarea) {
+    textarea.style.height = "auto";
+    textarea.style.height = Math.min(textarea.scrollHeight, 100) + "px";
+  }
+
+  document.getElementById("sendButton").addEventListener("click", function() {
+    let input = document.getElementById("messageInput");
+    let message = input.value.trim();
+    if (message) {
+      let chatBox = document.getElementById("autoScroll");
+
+      // Tạo một container mới cho câu hỏi và câu trả lời
+      let messageContainer = document.createElement("div");
+      messageContainer.classList.add("message-container");
+
+      // Thêm câu hỏi vào container
+      let userMessage = `<div class='flex justify-end mb-2'>
+                            <div class='bg-blue-500 text-white px-4 py-2 rounded-lg max-w-xs text-sm shadow break-words'>${message}</div>
+                          </div>`;
+      messageContainer.innerHTML += userMessage;
+
+      // Thêm container vào phần chat
+      chatBox.appendChild(messageContainer);
+      input.value = "";
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      fetch('/chatbot/sendMessage?userMessage=' + encodeURIComponent(message))
+              .then(response => response.text())
+              .then(botResponse => {
+                setTimeout(() => {
+                  generateBotResponse(messageContainer, botResponse);
+                }, 1000);
+              });
+    }
+  });
+
+  function generateBotResponse(messageContainer, responseText) {
+    // Tạo một container cho câu trả lời của bot
+    let botMessage = `<div class='flex items-center mb-2'>
+<!--                        <img src='/image/chatbot.png' alt='Avatar' class='w-8 h-8 rounded-full mr-2'>-->
+                        <div class='bg-white border px-4 py-2 rounded-lg max-w-xs text-sm shadow break-words' id='typingEffect'></div>
+                      </div>`;
+
+    // Thêm câu trả lời vào container của câu hỏi hiện tại
+    messageContainer.innerHTML += botMessage;
+    messageContainer.scrollTop = messageContainer.scrollHeight;
+
+    let typingDiv = messageContainer.querySelector("#typingEffect");
+    let index = 0;
+
+    // Hàm gõ chữ từng ký tự
+    function typeEffect() {
+      if (index < responseText.length) {
+        typingDiv.innerHTML += responseText[index];
+        index++;
+        setTimeout(typeEffect, 50); // Tốc độ gõ chữ
+      }
+    }
+    typeEffect();
+  }
+
+  function typeWelcomeMessage() {
+    let welcomeText = "Chào mừng tới với chat bot của nhóm Ổn Ổn Là Sút";
+    let typingDiv = document.getElementById("typingWelcome");
+    let index = 0;
+    function typeEffect() {
+      if (index < welcomeText.length) {
+        typingDiv.innerHTML += welcomeText[index];
+        index++;
+        setTimeout(typeEffect, 50);
+      }
+    }
+    typeEffect();
+  }
+
+  window.onload = typeWelcomeMessage;
+</script>
+</body>
+</html>

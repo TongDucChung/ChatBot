@@ -1,4 +1,4 @@
-package com.ononthisut.chatBot;
+package com.ononthisut.chatBot.service;
 
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;

@@ -1,4 +1,4 @@
-package com.ononthisut.chatBot;
+package com.ononthisut.chatBot.service;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;

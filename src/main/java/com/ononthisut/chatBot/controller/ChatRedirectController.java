@@ -1,19 +1,24 @@
-package com.ononthisut.chatBot;
+package com.ononthisut.chatBot.controller;
 
+import com.ononthisut.chatBot.service.ChatService;
+import com.ononthisut.chatBot.service.ImageService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.ai.image.ImageResponse;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-@RestController
-public class ChatController {
+@Controller
+@RequestMapping("chatbot")
+public class ChatRedirectController {
     private final ChatService chatService;
     private final ImageService imageService;
 
-    public ChatController(ChatService chatService, ImageService imageService) {
+    public ChatRedirectController(ChatService chatService, ImageService imageService) {
         this.chatService = chatService;
         this.imageService = imageService;
     }
@@ -30,4 +35,11 @@ public class ChatController {
         String imageUrl = imageResponse.getResult().getOutput().getUrl();
         httpResponse.sendRedirect(imageUrl);
     }
+
+    @GetMapping("/chat")
+    public String showChatPage(Model model) {
+        return "chatView";
+    }
 }
+
+
