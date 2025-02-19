@@ -32,7 +32,7 @@ registered users to perform tasks such as:
 - DBeaver
 
 # Overall Design
-- todo
+![img_6.png](img_6.png)- todo
 
 # Getting Started
 
